@@ -1,49 +1,134 @@
-## About Laravel Movie DB
+# Laravel Movie DB
 
-Ini adalah sistem database movie menggunakan laravel untuk mata kuliah Konstruksi dan Evolusi Perangkat Lunak Prodi Teknologi Rekayasa Perangkat Lunak Jurusan Teknologi Informasi Politeknik Negeri Padang.
+A movie database system built with Laravel for the Software Construction and Evolution course at the Software Engineering Technology Program, Department of Information Technology, Politeknik Negeri Padang.
 
-Silahkan clone repository ini ke PC Anda.
-Jika Anda baru saja meng-clone repository proyek Laravel dan ingin menjalankan perintah migrasi, ada beberapa langkah yang perlu Anda lakukan terlebih dahulu. Berikut adalah langkah-langkahnya:
+## Setup Instructions
 
-1. **Composer Install:**
-   Pastikan Anda telah menginstal Composer di sistem Anda. Kemudian, jalankan perintah berikut di terminal di direktori proyek Laravel Anda untuk menginstal dependensi:
+To set up this project after cloning the repository, follow these steps:
 
+1. **Install Dependencies**:
+
+    ```bash
     composer install
+    ```
 
-2. **Environment File:**
-   Duplikat file `.env.example` menjadi `.env` di direktori proyek Anda. Sesuaikan pengaturan database dan konfigurasi lainnya di file `.env` sesuai dengan kebutuhan Anda.
+2. **Environment Setup**:
 
+    ```bash
     cp .env.example .env
+    ```
 
-3. **Generate Application Key:**
-   Laravel menggunakan kunci aplikasi untuk enkripsi data. Jalankan perintah berikut untuk menghasilkan kunci aplikasi:
+    Configure your database settings in the `.env` file.
 
+3. **Generate Application Key**:
+
+    ```bash
     php artisan key:generate
+    ```
 
-4. **Set Database Connection:**
-   Pastikan bahwa pengaturan koneksi database di file `.env` sesuai dengan konfigurasi database Anda.
+4. **Run Migrations**:
 
-   Contoh: Jika Anda membuat database dbmovie, maka di file `.env` ubahlah `DB_DATABASE=laravel` menjadi `DB_DATABASE=dbmovie`
-
-6. **Run Migrations:**
-   Sekarang Anda dapat menjalankan perintah migrasi untuk membuat tabel-tabel database:
-
+    ```bash
     php artisan migrate
+    ```
 
-    Perintah ini akan mengeksekusi semua migrasi yang terkandung di proyek Laravel ini.
+5. **Run Seeds** (Optional):
 
-7. **Run Seeds (Opsional):**
-   Proyek ini menggunakan _seeding_ untuk mengisi basis data awal, jalankan perintah berikut:
-
+    ```bash
     php artisan db:seed
+    ```
 
-    Perintah ini akan menjalankan seeder yang telah didefinisikan.
-
-8. **Serve Aplikasi:**
-   Setelah langkah-langkah di atas selesai, Anda dapat menjalankan server pengembangan Laravel untuk melihat proyek Anda:
-
+6. **Start Development Server**:
+    ```bash
     php artisan serve
+    ```
+    The application will be available at http://localhost:8000.
 
-    Aplikasi akan berjalan di http://localhost:8000 secara default.
+## Refactoring Documentation
 
-_Credit by: Yori Adi Atma_
+The MovieController has been refactored to improve code quality and maintainability. Here's a detailed breakdown of the refactorings:
+
+### 1. Validation Logic Refactoring
+
+-   **What**: Extracted duplicate validation rules from `store` and `update` methods
+-   **How**: Created a private `validateMovie()` method that handles both creation and update scenarios
+-   **Benefits**:
+    -   Reduced code duplication
+    -   Centralized validation rules
+    -   Made validation logic reusable
+    -   Easier to maintain and update validation rules
+
+### 2. Search Functionality Refactoring
+
+-   **What**: Extracted search logic from the `index` method
+-   **How**:
+    -   Created a private `searchMovies()` method in the controller
+    -   Added a `scopeSearch()` method to the Movie model as an alternative approach
+-   **Benefits**:
+    -   Simplified the `index` method
+    -   Made search functionality reusable
+    -   Improved readability
+    -   Better separation of concerns
+
+### 3. File Handling Refactoring
+
+-   **What**: Extracted image upload, storage, and deletion logic
+-   **How**: Created a dedicated `FileService` class with methods:
+    -   `saveImage()`: Handles image uploads and storage
+    -   `deleteImage()`: Handles image deletion
+-   **Benefits**:
+    -   Centralized file operations
+    -   Removed duplicate code across methods
+    -   Made file handling logic reusable across the application
+    -   Better testability of file operations
+
+### 4. Form Request Validation
+
+-   **What**: Moved validation rules to dedicated Form Request classes
+-   **How**: Created:
+    -   `MovieStoreRequest`: For movie creation validation
+    -   `MovieUpdateRequest`: For movie update validation
+-   **Benefits**:
+    -   Cleaner controller methods
+    -   Validation logic is isolated and reusable
+    -   Better organization of code
+    -   Follows Laravel best practices
+
+### 5. Delete Method Refactoring
+
+-   **What**: Improved the `delete` method by extracting file deletion logic
+-   **How**: Leveraged the `FileService` to handle image deletion
+-   **Benefits**:
+    -   Consistent approach to file deletion
+    -   Removed duplicate code
+    -   Improved maintainability
+
+### 6. Dependency Injection
+
+-   **What**: Added proper dependency injection for the FileService
+-   **How**: Added a constructor to inject the FileService
+-   **Benefits**:
+    -   Better testability
+    -   Follows SOLID principles
+    -   More flexible architecture
+
+### 7. Model Enhancement
+
+-   **What**: Added query scope to the Movie model
+-   **How**: Implemented `scopeSearch()` method in the Movie model
+-   **Benefits**:
+    -   More reusable search functionality
+    -   Better adherence to Laravel conventions
+    -   Cleaner controller code
+
+## Overall Benefits of the Refactoring
+
+1. **Reduced Code Duplication**: Eliminated repeated code patterns across methods
+2. **Improved Maintainability**: Easier to update and maintain with centralized logic
+3. **Better Separation of Concerns**: Each class and method has a clear, single responsibility
+4. **Enhanced Testability**: Isolated components are easier to test
+5. **Follows SOLID Principles**: Better adherence to software design principles
+6. **Follows Laravel Best Practices**: Aligns with Laravel's recommended patterns and practices
+7. **Improved Code Organization**: Clearer structure makes the code easier to understand
+
+_Original credit: Yori Adi Atma_
