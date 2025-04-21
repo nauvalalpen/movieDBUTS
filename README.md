@@ -1,134 +1,73 @@
 # Laravel Movie DB
 
-A movie database system built with Laravel for the Software Construction and Evolution course at the Software Engineering Technology Program, Department of Information Technology, Politeknik Negeri Padang.
+## Dokumentasi Refactoring
 
-## Setup Instructions
+`MovieController` telah di-refactor (diperbaiki strukturnya) untuk meningkatkan kualitas kode dan kemudahan pemeliharaan (maintainability). Berikut adalah rincian detail refactoring yang dilakukan:
 
-To set up this project after cloning the repository, follow these steps:
+### 1. Refactoring Logika Validasi
 
-1. **Install Dependencies**:
+-   **Apa**: Memindahkan (mengekstrak) aturan validasi yang sama (duplikat) dari method `store` dan `update`.
+-   **Bagaimana**: Membuat method `private validateMovie()` yang menangani validasi baik untuk pembuatan data baru maupun pembaruan data. _[Catatan: Kemudian ditingkatkan lagi dengan Form Request, lihat poin 4]_.
+-   **Manfaat**:
+    -   Mengurangi duplikasi kode.
+    -   Memusatkan aturan validasi di satu tempat.
+    -   Membuat logika validasi bisa digunakan ulang (reusable).
+    -   Lebih mudah untuk memelihara dan mengubah aturan validasi.
 
-    ```bash
-    composer install
-    ```
+### 2. Refactoring Fungsionalitas Pencarian
 
-2. **Environment Setup**:
+-   **Apa**: Memindahkan logika pencarian dari method `index`.
+-   **Bagaimana**:
+    -   Membuat method `private searchMovies()` di dalam controller.
+    -   _Alternatif/Peningkatan_: Menambahkan method `scopeSearch()` di model `Movie`.
+-   **Manfaat**:
+    -   Method `index` menjadi lebih sederhana.
+    -   Fungsi pencarian menjadi reusable.
+    -   Kode lebih mudah dibaca (readability).
+    -   Pemisahan tanggung jawab (separation of concerns) yang lebih baik.
 
-    ```bash
-    cp .env.example .env
-    ```
+### 3. Refactoring Penanganan File
 
-    Configure your database settings in the `.env` file.
+-   **Apa**: Memindahkan logika unggah (upload), penyimpanan, dan penghapusan gambar.
+-   **Bagaimana**: Membuat class khusus bernama `FileService` dengan method:
+    -   `saveImage()`: Menangani proses unggah dan penyimpanan gambar.
+    -   `deleteImage()`: Menangani proses penghapusan gambar.
+-   **Manfaat**:
+    -   Memusatkan operasi terkait file.
+    -   Menghilangkan kode yang sama di beberapa method.
+    -   Membuat logika penanganan file reusable di bagian lain aplikasi jika diperlukan.
+    -   Operasi file jadi lebih mudah diuji (testability).
 
-3. **Generate Application Key**:
+### 4. Validasi Menggunakan Form Request
 
-    ```bash
-    php artisan key:generate
-    ```
+-   **Apa**: Memindahkan aturan validasi ke class Form Request khusus (cara yang lebih direkomendasikan Laravel daripada method private di controller).
+-   **Bagaimana**: Membuat class:
+    -   `MovieStoreRequest`: Untuk validasi saat membuat film baru.
+    -   `MovieUpdateRequest`: Untuk validasi saat memperbarui film.
+-   **Manfaat**:
+    -   Method di Controller menjadi lebih bersih dan fokus pada logika utama.
+    -   Logika validasi terpisah (terisolasi) dan reusable.
+    -   Organisasi kode menjadi lebih rapi.
+    -   Mengikuti _best practice_ (praktik terbaik) dari Laravel.
 
-4. **Run Migrations**:
+### 5. Refactoring Method `delete`
 
-    ```bash
-    php artisan migrate
-    ```
+-   **Apa**: Memperbaiki method `delete` dengan memindahkan logika penghapusan file gambar.
+-   **Bagaimana**: Menggunakan `FileService` yang sudah dibuat untuk menangani penghapusan gambar.
+-   **Manfaat**:
+    -   Cara penghapusan file menjadi konsisten (menggunakan `FileService`).
+    -   Menghilangkan duplikasi kode (jika ada logika hapus file di tempat lain).
+    -   Lebih mudah dipelihara.
 
-5. **Run Seeds** (Optional):
+## Manfaat Keseluruhan dari Refactoring
 
-    ```bash
-    php artisan db:seed
-    ```
+1.  **Mengurangi Duplikasi Kode**: Menghilangkan pola kode yang berulang di berbagai method.
+2.  **Kemudahan Pemeliharaan (Maintainability) Lebih Baik**: Kode lebih mudah diperbarui dan dirawat karena logikanya terpusat.
+3.  **Pemisahan Tanggung Jawab (Separation of Concerns) Lebih Baik**: Setiap class dan method punya satu tugas yang jelas.
+4.  **Kemudahan Pengujian (Testability) Meningkat**: Komponen yang terpisah lebih mudah untuk dites secara individual.
+5.  **Mengikuti Prinsip SOLID**: Kode menjadi lebih sesuai dengan prinsip-prinsip desain perangkat lunak yang baik.
+6.  **Mengikuti Best Practice Laravel**: Mengikuti pola dan praktik yang dianjurkan oleh framework Laravel.
+7.  **Organisasi Kode Lebih Baik**: Struktur kode yang lebih jelas membuatnya lebih mudah dipahami.
 
-6. **Start Development Server**:
-    ```bash
-    php artisan serve
-    ```
-    The application will be available at http://localhost:8000.
-
-## Refactoring Documentation
-
-The MovieController has been refactored to improve code quality and maintainability. Here's a detailed breakdown of the refactorings:
-
-### 1. Validation Logic Refactoring
-
--   **What**: Extracted duplicate validation rules from `store` and `update` methods
--   **How**: Created a private `validateMovie()` method that handles both creation and update scenarios
--   **Benefits**:
-    -   Reduced code duplication
-    -   Centralized validation rules
-    -   Made validation logic reusable
-    -   Easier to maintain and update validation rules
-
-### 2. Search Functionality Refactoring
-
--   **What**: Extracted search logic from the `index` method
--   **How**:
-    -   Created a private `searchMovies()` method in the controller
-    -   Added a `scopeSearch()` method to the Movie model as an alternative approach
--   **Benefits**:
-    -   Simplified the `index` method
-    -   Made search functionality reusable
-    -   Improved readability
-    -   Better separation of concerns
-
-### 3. File Handling Refactoring
-
--   **What**: Extracted image upload, storage, and deletion logic
--   **How**: Created a dedicated `FileService` class with methods:
-    -   `saveImage()`: Handles image uploads and storage
-    -   `deleteImage()`: Handles image deletion
--   **Benefits**:
-    -   Centralized file operations
-    -   Removed duplicate code across methods
-    -   Made file handling logic reusable across the application
-    -   Better testability of file operations
-
-### 4. Form Request Validation
-
--   **What**: Moved validation rules to dedicated Form Request classes
--   **How**: Created:
-    -   `MovieStoreRequest`: For movie creation validation
-    -   `MovieUpdateRequest`: For movie update validation
--   **Benefits**:
-    -   Cleaner controller methods
-    -   Validation logic is isolated and reusable
-    -   Better organization of code
-    -   Follows Laravel best practices
-
-### 5. Delete Method Refactoring
-
--   **What**: Improved the `delete` method by extracting file deletion logic
--   **How**: Leveraged the `FileService` to handle image deletion
--   **Benefits**:
-    -   Consistent approach to file deletion
-    -   Removed duplicate code
-    -   Improved maintainability
-
-### 6. Dependency Injection
-
--   **What**: Added proper dependency injection for the FileService
--   **How**: Added a constructor to inject the FileService
--   **Benefits**:
-    -   Better testability
-    -   Follows SOLID principles
-    -   More flexible architecture
-
-### 7. Model Enhancement
-
--   **What**: Added query scope to the Movie model
--   **How**: Implemented `scopeSearch()` method in the Movie model
--   **Benefits**:
-    -   More reusable search functionality
-    -   Better adherence to Laravel conventions
-    -   Cleaner controller code
-
-## Overall Benefits of the Refactoring
-
-1. **Reduced Code Duplication**: Eliminated repeated code patterns across methods
-2. **Improved Maintainability**: Easier to update and maintain with centralized logic
-3. **Better Separation of Concerns**: Each class and method has a clear, single responsibility
-4. **Enhanced Testability**: Isolated components are easier to test
-5. **Follows SOLID Principles**: Better adherence to software design principles
-6. **Follows Laravel Best Practices**: Aligns with Laravel's recommended patterns and practices
-7. **Improved Code Organization**: Clearer structure makes the code easier to understand
-
-_Original credit: Yori Adi Atma_
+_Kredit Awal: Yori Adi Atma_
+_Diperbarui oleh: [Nauval Alpen Perdana](https://github.com/nauvalalpen)_
