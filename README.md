@@ -69,5 +69,5 @@
 6.  **Mengikuti Best Practice Laravel**: Mengikuti pola dan praktik yang dianjurkan oleh framework Laravel.
 7.  **Organisasi Kode Lebih Baik**: Struktur kode yang lebih jelas membuatnya lebih mudah dipahami.
 
-_Kredit Awal: Yori Adi Atma_
-_Diperbarui oleh: [Nauval Alpen Perdana](https://github.com/nauvalalpen)_
+-   _Kredit Awal: Yori Adi Atma_
+-   _Diperbarui oleh: [Nauval Alpen Perdana](https://github.com/nauvalalpen)_
